@@ -90,15 +90,31 @@ export default function Landing() {
                 const statusColor = c.status === 'active' ? 'var(--teal)' : c.status === 'complete' ? 'var(--purple)' : 'var(--text-muted)'
                 const statusLabel = c.status === 'active' ? '🟢 Active' : c.status === 'complete' ? '🏆 Complete' : '⏳ Waiting'
                 return (
-                  <div key={p.id} className="card" style={{ cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
-                    onClick={() => navigate(`/challenge/${c.id}`)}>
-                    <div>
+                  <div key={p.id} className="card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
+                    <div style={{ flex: 1, cursor: 'pointer' }} onClick={() => navigate(`/challenge/${c.id}`)}>
                       <p style={{ fontWeight: 800, fontSize: 16 }}>{p.avatar_emoji} {p.display_name}</p>
                       <p style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 600, marginTop: 2 }}>
                         {c.duration_days} days · {format(parseISO(c.start_date), 'MMM d')} → {format(parseISO(c.end_date), 'MMM d')}
                       </p>
                     </div>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: statusColor }}>{statusLabel}</span>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: statusColor, flexShrink: 0 }}>{statusLabel}</span>
+                    <button
+                      onClick={async (e) => {
+                        e.stopPropagation()
+                        if (!confirm('Delete this challenge? This cannot be undone.')) return
+                        await supabase.from('check_ins').delete().in('player_id', [p.id])
+                        await supabase.from('goals').delete().eq('challenge_id', c.id)
+                        await supabase.from('players').delete().eq('challenge_id', c.id)
+                        await supabase.from('challenges').delete().eq('id', c.id)
+                        setChallenges(prev => prev.filter(x => x.id !== p.id))
+                      }}
+                      style={{
+                        background: 'none', border: 'none', fontSize: 18,
+                        cursor: 'pointer', color: 'var(--text-muted)', flexShrink: 0,
+                        padding: '4px 6px', lineHeight: 1,
+                      }}
+                      title="Delete challenge"
+                    >🗑️</button>
                   </div>
                 )
               })}
