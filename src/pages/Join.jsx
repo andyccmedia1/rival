@@ -136,7 +136,7 @@ export default function Join() {
       </p>
       <button className="btn-primary" style={{ width: '100%', maxWidth: 320 }}
         onClick={() => navigate(`/login?redirect=/join/${inviteCode}`)}>
-        ✉️ Sign in to accept
+        Sign in to accept
       </button>
     </div>
   )

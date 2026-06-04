@@ -6,39 +6,34 @@ export default function Login() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const redirect = searchParams.get('redirect') || '/'
+  const [mode, setMode] = useState('signin') // 'signin' | 'signup'
   const [email, setEmail] = useState('')
-  const [sent, setSent] = useState(false)
+  const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const handleSend = async () => {
+  const handleSubmit = async () => {
     if (!email.trim()) return setError('Enter your email!')
+    if (password.length < 6) return setError('Password must be at least 6 characters.')
     setLoading(true)
     setError('')
-    const { error: err } = await supabase.auth.signInWithOtp({
-      email: email.trim(),
-      options: { emailRedirectTo: `${window.location.origin}${redirect}` },
-    })
-    setLoading(false)
-    if (err) return setError(err.message)
-    setSent(true)
-  }
 
-  if (sent) return (
-    <div className="page" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', paddingTop: 80 }}>
-      <div className="card animate-slide-up" style={{ padding: 36, maxWidth: 340 }}>
-        <div style={{ fontSize: 56, marginBottom: 16 }}>📬</div>
-        <h2 style={{ fontSize: 28, color: 'var(--white)' }}>Check your email</h2>
-        <p style={{ color: 'var(--text-soft)', fontWeight: 500, marginTop: 12, lineHeight: 1.6 }}>
-          Magic link sent to <span style={{ color: 'var(--white)', fontWeight: 600 }}>{email}</span>. Tap it to sign in.
-        </p>
-        <button style={{ marginTop: 28, background: 'none', border: 'none', color: 'var(--text-soft)', fontWeight: 600, fontSize: 14, cursor: 'pointer' }}
-          onClick={() => setSent(false)}>
-          ← Try a different email
-        </button>
-      </div>
-    </div>
-  )
+    const fn = mode === 'signup'
+      ? supabase.auth.signUp({ email: email.trim(), password })
+      : supabase.auth.signInWithPassword({ email: email.trim(), password })
+
+    const { data, error: err } = await fn
+    setLoading(false)
+
+    if (err) return setError(err.message)
+
+    // If sign-up requires email confirmation, there's no session yet.
+    if (mode === 'signup' && !data.session) {
+      return setError('Account created! Please confirm your email, then sign in.')
+    }
+
+    navigate(redirect)
+  }
 
   return (
     <div className="page" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', paddingTop: 60 }}>
@@ -49,23 +44,45 @@ export default function Login() {
 
       <div className="animate-float" style={{ fontSize: 56, marginBottom: 14, filter: 'drop-shadow(0 8px 24px rgba(40,20,80,0.4))' }}>⚔️</div>
       <h1 style={{ fontSize: 44, marginBottom: 8, fontWeight: 800, color: 'var(--white)', textShadow: '0 4px 24px rgba(40,20,80,0.35)' }}>Rival</h1>
-      <p style={{ color: 'var(--text-soft)', fontSize: 15, marginBottom: 36, textAlign: 'center' }}>
-        We'll email you a magic link — no password needed.
+      <p style={{ color: 'var(--text-soft)', fontSize: 15, marginBottom: 28, textAlign: 'center' }}>
+        {mode === 'signup' ? 'Create an account to track your challenges.' : 'Welcome back, warrior.'}
       </p>
 
       <div className="card" style={{ width: '100%', maxWidth: 340, padding: 24 }}>
-        <label style={{ fontWeight: 600, fontSize: 14, display: 'block', marginBottom: 8, color: 'var(--text-soft)' }}>Your email</label>
+        {/* Mode toggle */}
+        <div style={{ display: 'flex', gap: 4, background: 'rgba(255,255,255,0.08)', borderRadius: 'var(--radius-pill)', padding: 4, marginBottom: 20 }}>
+          {[['signin', 'Sign in'], ['signup', 'Create account']].map(([m, label]) => (
+            <button key={m} onClick={() => { setMode(m); setError('') }} style={{
+              flex: 1, padding: '9px 12px', borderRadius: 'var(--radius-pill)',
+              background: mode === m ? 'var(--white)' : 'transparent',
+              color: mode === m ? '#7B4FB0' : 'var(--text-soft)',
+              fontWeight: 700, fontSize: 13, transition: 'all 0.2s',
+            }}>{label}</button>
+          ))}
+        </div>
+
+        <label style={{ fontWeight: 600, fontSize: 14, display: 'block', marginBottom: 8, color: 'var(--text-soft)' }}>Email</label>
         <input
           type="email"
           value={email}
           onChange={e => { setEmail(e.target.value); setError('') }}
           placeholder="you@example.com"
-          onKeyDown={e => e.key === 'Enter' && handleSend()}
           autoFocus
         />
-        {error && <p style={{ color: 'var(--red)', fontWeight: 600, marginTop: 8, fontSize: 13 }}>{error}</p>}
-        <button className="btn-primary" style={{ width: '100%', marginTop: 16 }} onClick={handleSend} disabled={loading}>
-          {loading ? 'Sending...' : '✉️ Send magic link'}
+
+        <label style={{ fontWeight: 600, fontSize: 14, display: 'block', margin: '14px 0 8px', color: 'var(--text-soft)' }}>Password</label>
+        <input
+          type="password"
+          value={password}
+          onChange={e => { setPassword(e.target.value); setError('') }}
+          placeholder="••••••••"
+          onKeyDown={e => e.key === 'Enter' && handleSubmit()}
+        />
+
+        {error && <p style={{ color: 'var(--red)', fontWeight: 600, marginTop: 10, fontSize: 13 }}>{error}</p>}
+
+        <button className="btn-primary" style={{ width: '100%', marginTop: 18 }} onClick={handleSubmit} disabled={loading}>
+          {loading ? 'Please wait...' : mode === 'signup' ? '✨ Create account' : '⚔️ Sign in'}
         </button>
       </div>
     </div>
