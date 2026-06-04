@@ -118,9 +118,14 @@ export default function Dashboard() {
       ci.date <= weekEnd
     ).length
 
-  const daysLeft = differenceInDays(parseISO(challenge.end_date), new Date()) + 1
+  const now = new Date()
+  const startD = parseISO(challenge.start_date)
+  const endD = parseISO(challenge.end_date)
+  const notStarted = today < challenge.start_date
   const daysTotal = challenge.duration_days
-  const daysPassed = daysTotal - daysLeft
+  const daysUntilStart = Math.max(0, differenceInDays(startD, now) + (today < challenge.start_date ? 1 : 0))
+  const daysPassed = Math.min(daysTotal, Math.max(0, differenceInDays(now, startD)))
+  const daysLeft = Math.max(0, differenceInDays(endD, now) + 1)
 
   const mySlot = myPlayer?.slot ?? local?.slot
   const partner = players.find(p => p.slot !== mySlot)
@@ -132,7 +137,9 @@ export default function Dashboard() {
         <div>
           <h1 style={{ fontSize: 30, color: 'var(--white)' }}>Battle ⚔️</h1>
           <p style={{ color: 'var(--text-muted)', fontSize: 14, marginTop: 2, fontWeight: 500 }}>
-            Day {daysPassed + 1} of {daysTotal} · {daysLeft} days left
+            {notStarted
+              ? `Starts ${format(startD, 'MMM d')} · in ${daysUntilStart} ${daysUntilStart === 1 ? 'day' : 'days'}`
+              : `Day ${daysPassed + 1} of ${daysTotal} · ${daysLeft} days left`}
           </p>
         </div>
         <div style={{
@@ -143,8 +150,8 @@ export default function Dashboard() {
           padding: '8px 16px',
           textAlign: 'center',
         }}>
-          <p style={{ fontWeight: 700, fontSize: 24, color: 'var(--white)', lineHeight: 1, fontFamily: 'Sora, sans-serif' }}>{daysLeft}</p>
-          <p style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 500 }}>days left</p>
+          <p style={{ fontWeight: 700, fontSize: 24, color: 'var(--white)', lineHeight: 1, fontFamily: 'Sora, sans-serif' }}>{notStarted ? daysUntilStart : daysLeft}</p>
+          <p style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 500 }}>{notStarted ? 'til start' : 'days left'}</p>
         </div>
       </div>
 
@@ -153,7 +160,7 @@ export default function Dashboard() {
           background: 'linear-gradient(90deg, var(--player-a), var(--player-b))',
           height: '100%',
           borderRadius: 99,
-          width: `${Math.round((daysPassed / daysTotal) * 100)}%`,
+          width: `${notStarted ? 0 : Math.round((daysPassed / daysTotal) * 100)}%`,
           transition: 'width 0.5s ease',
           boxShadow: '0 0 12px rgba(255,255,255,0.4)',
         }} />
@@ -169,6 +176,27 @@ export default function Dashboard() {
         challenge={challenge}
       />
 
+      {notStarted ? (
+        <div className="card" style={{ marginTop: 28, textAlign: 'center', padding: 28 }}>
+          <div style={{ fontSize: 48, marginBottom: 12 }}>⏳</div>
+          <h2 style={{ fontSize: 22, marginBottom: 6, color: 'var(--white)' }}>Challenge hasn't started yet</h2>
+          <p style={{ color: 'var(--text-soft)', fontWeight: 500, lineHeight: 1.5 }}>
+            Check-ins open on <strong>{format(startD, 'EEEE, MMMM d')}</strong>.<br />
+            Come back in {daysUntilStart} {daysUntilStart === 1 ? 'day' : 'days'} to start your streak!
+          </p>
+          <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid var(--glass-border)' }}>
+            <p style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 500 }}>Your goals</p>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center', marginTop: 10 }}>
+              {myGoals.map(goal => (
+                <span key={goal.id} style={{
+                  background: 'var(--glass-soft)', border: '1px solid var(--glass-border)',
+                  borderRadius: 'var(--radius-pill)', padding: '6px 14px', fontSize: 13, fontWeight: 500,
+                }}>{goal.emoji} {goal.label}</span>
+              ))}
+            </div>
+          </div>
+        </div>
+      ) : (
       <div style={{ marginTop: 28 }}>
         <h2 style={{ fontSize: 22, marginBottom: 4, color: 'var(--white)' }}>Today's check-in</h2>
         <p style={{ color: 'var(--text-muted)', fontSize: 14, marginBottom: 16, fontWeight: 500 }}>
@@ -210,6 +238,7 @@ export default function Dashboard() {
           </div>
         )}
       </div>
+      )}
 
     </div>
   )
