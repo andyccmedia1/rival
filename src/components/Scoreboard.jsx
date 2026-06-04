@@ -17,22 +17,23 @@ export default function Scoreboard({ players, allCheckIns, allGoals = [], mySlot
   const player2 = players.find(p => p.slot === 2)
 
   return (
-    <div className="card" style={{ padding: 16 }}>
-      <p style={{ fontSize: 11, fontWeight: 600, color: 'var(--cyan)', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 14 }}>
-        ◈ Battle Standings
+    <div className="card" style={{ padding: 18 }}>
+      <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-soft)', marginBottom: 14 }}>
+        ⚔️ Battle standings
       </p>
 
       <div style={{ display: 'flex', gap: 10 }}>
         {[player1, player2].map((p, i) => {
+          const slotColor = i === 0 ? 'var(--player-a)' : 'var(--player-b)'
           if (!p) {
             return (
               <div key={i} style={{
-                flex: 1, padding: '14px 12px', borderRadius: 'var(--radius-sm)',
-                background: 'var(--surface)', border: '2px dashed var(--border)',
+                flex: 1, padding: '16px 12px', borderRadius: 'var(--radius-sm)',
+                background: 'var(--glass-soft)', border: '1px dashed var(--glass-border)',
                 textAlign: 'center',
               }}>
-                <p style={{ fontSize: 24, marginBottom: 4 }}>❓</p>
-                <p style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 700 }}>Waiting for opponent…</p>
+                <p style={{ fontSize: 26, marginBottom: 4 }}>❓</p>
+                <p style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 500 }}>Waiting…</p>
               </div>
             )
           }
@@ -43,40 +44,40 @@ export default function Scoreboard({ players, allCheckIns, allGoals = [], mySlot
 
           return (
             <div key={p.id} style={{
-              flex: 1, padding: '14px 12px', borderRadius: 'var(--radius-sm)',
-              background: isMe ? 'var(--purple-dim)' : 'var(--surface2)',
-              border: `1px solid ${leading ? 'var(--yellow)' : isMe ? 'var(--purple)' : 'var(--border)'}`,
-              boxShadow: isMe ? '0 0 20px var(--purple-glow)' : 'none',
+              flex: 1, padding: '16px 12px', borderRadius: 'var(--radius-sm)',
+              background: 'var(--glass-soft)',
+              border: `1px solid ${leading ? 'var(--gold)' : isMe ? slotColor : 'var(--glass-border)'}`,
+              boxShadow: leading ? '0 0 24px rgba(255,214,107,0.3)' : 'none',
               textAlign: 'center', position: 'relative',
             }}>
               {leading && (
-                <span style={{ position: 'absolute', top: -10, right: -6, fontSize: 20 }}>👑</span>
+                <span style={{ position: 'absolute', top: -12, right: -4, fontSize: 22 }}>👑</span>
               )}
               {isMe && (
                 <span style={{
-                  position: 'absolute', top: -10, left: 8,
-                  background: 'var(--purple)', color: 'white',
-                  fontSize: 10, fontWeight: 800, padding: '2px 6px', borderRadius: 99,
+                  position: 'absolute', top: -9, left: 8,
+                  background: slotColor, color: '#3A1A5C',
+                  fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 99,
                 }}>YOU</span>
               )}
-              <div style={{ fontSize: 32, marginBottom: 4 }}>{p.avatar_emoji}</div>
-              <p style={{ fontWeight: 800, fontSize: 14, marginBottom: 8, color: isMe ? 'var(--navy-mid)' : 'var(--text)' }}>{p.display_name}</p>
+              <div style={{ fontSize: 34, marginBottom: 6 }}>{p.avatar_emoji}</div>
+              <p style={{ fontWeight: 700, fontSize: 14, marginBottom: 10, color: 'var(--white)', fontFamily: 'Sora, sans-serif' }}>{p.display_name}</p>
 
               <div style={{
-                background: 'rgba(255,255,255,0.05)', borderRadius: 2, height: 3, marginBottom: 8,
+                background: 'rgba(255,255,255,0.12)', borderRadius: 99, height: 6, marginBottom: 8,
               }}>
                 <div style={{
-                  background: isMe ? 'var(--purple)' : 'var(--cyan)',
-                  height: '100%', borderRadius: 2,
+                  background: slotColor,
+                  height: '100%', borderRadius: 99,
                   width: `${score.pct}%`,
                   transition: 'width 0.6s ease',
-                  boxShadow: isMe ? '0 0 6px var(--purple-glow)' : '0 0 6px var(--cyan-glow)',
+                  boxShadow: `0 0 10px ${slotColor}`,
                 }} />
               </div>
-              <p style={{ fontWeight: 700, fontSize: 24, color: isMe ? 'var(--purple)' : 'var(--cyan)', fontFamily: 'Rajdhani, sans-serif' }}>
+              <p style={{ fontWeight: 800, fontSize: 26, color: slotColor, fontFamily: 'Sora, sans-serif' }}>
                 {score.pct}%
               </p>
-              <p style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 500, letterSpacing: 0.5 }}>
+              <p style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 500 }}>
                 {score.count} / {score.total}
               </p>
             </div>

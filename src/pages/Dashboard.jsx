@@ -130,31 +130,32 @@ export default function Dashboard() {
     <div className="page">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <div>
-          <h1 style={{ fontSize: 26, letterSpacing: 3, color: 'var(--cyan)' }}>BATTLE ⚔️</h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: 12, marginTop: 2, letterSpacing: 0.5 }}>
-            DAY {daysPassed + 1} / {daysTotal}
+          <h1 style={{ fontSize: 30, color: 'var(--white)' }}>Battle ⚔️</h1>
+          <p style={{ color: 'var(--text-muted)', fontSize: 14, marginTop: 2, fontWeight: 500 }}>
+            Day {daysPassed + 1} of {daysTotal} · {daysLeft} days left
           </p>
         </div>
         <div style={{
-          background: 'var(--cyan-dim)',
-          border: '1px solid var(--border-strong)',
+          background: 'var(--glass)',
+          backdropFilter: 'blur(12px)',
+          border: '1px solid var(--glass-border)',
           borderRadius: 'var(--radius-sm)',
-          padding: '6px 14px',
+          padding: '8px 16px',
           textAlign: 'center',
         }}>
-          <p style={{ fontWeight: 700, fontSize: 22, color: 'var(--cyan)', lineHeight: 1, fontFamily: 'Rajdhani, sans-serif' }}>{daysLeft}</p>
-          <p style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase' }}>days left</p>
+          <p style={{ fontWeight: 700, fontSize: 24, color: 'var(--white)', lineHeight: 1, fontFamily: 'Sora, sans-serif' }}>{daysLeft}</p>
+          <p style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 500 }}>days left</p>
         </div>
       </div>
 
-      <div style={{ background: 'var(--surface2)', borderRadius: 2, height: 3, marginBottom: 24 }}>
+      <div style={{ background: 'rgba(255,255,255,0.12)', borderRadius: 99, height: 6, marginBottom: 24 }}>
         <div style={{
-          background: 'linear-gradient(90deg, var(--cyan), var(--purple))',
+          background: 'linear-gradient(90deg, var(--player-a), var(--player-b))',
           height: '100%',
-          borderRadius: 2,
+          borderRadius: 99,
           width: `${Math.round((daysPassed / daysTotal) * 100)}%`,
           transition: 'width 0.5s ease',
-          boxShadow: '0 0 8px var(--cyan-glow)',
+          boxShadow: '0 0 12px rgba(255,255,255,0.4)',
         }} />
       </div>
 
@@ -169,9 +170,9 @@ export default function Dashboard() {
       />
 
       <div style={{ marginTop: 28 }}>
-        <h2 style={{ fontSize: 18, letterSpacing: 2, marginBottom: 4, color: 'var(--text)' }}>TODAY'S CHECK-IN</h2>
-        <p style={{ color: 'var(--text-muted)', fontSize: 12, marginBottom: 16, letterSpacing: 0.5 }}>
-          {format(new Date(), 'EEEE, MMMM d').toUpperCase()}
+        <h2 style={{ fontSize: 22, marginBottom: 4, color: 'var(--white)' }}>Today's check-in</h2>
+        <p style={{ color: 'var(--text-muted)', fontSize: 14, marginBottom: 16, fontWeight: 500 }}>
+          {format(new Date(), 'EEEE, MMMM d')}
         </p>
 
         {myGoals.length === 0 ? (
@@ -193,17 +194,18 @@ export default function Dashboard() {
 
         {myGoals.length > 0 && (
           <div style={{
-            marginTop: 16, textAlign: 'center', padding: 12,
-            background: checkIns.length === myGoals.length ? 'var(--green-dim)' : 'var(--surface2)',
-            border: `1px solid ${checkIns.length === myGoals.length ? 'var(--green)' : 'var(--border)'}`,
+            marginTop: 16, textAlign: 'center', padding: 14,
+            background: checkIns.length === myGoals.length ? 'rgba(91,233,185,0.18)' : 'var(--glass-soft)',
+            border: `1px solid ${checkIns.length === myGoals.length ? 'var(--green)' : 'var(--glass-border)'}`,
             borderRadius: 'var(--radius-sm)',
+            backdropFilter: 'blur(8px)',
             transition: 'all 0.4s',
           }}>
-            <p style={{ fontWeight: 700, fontSize: 13, letterSpacing: 1, textTransform: 'uppercase',
-              color: checkIns.length === myGoals.length ? 'var(--green)' : 'var(--text-muted)' }}>
+            <p style={{ fontWeight: 600, fontSize: 14,
+              color: checkIns.length === myGoals.length ? 'var(--green)' : 'var(--text-soft)' }}>
               {checkIns.length === myGoals.length
-                ? '⚡ All objectives complete'
-                : `${checkIns.length} / ${myGoals.length} objectives today`}
+                ? '🎉 All done for today! Keep it up!'
+                : `${checkIns.length} / ${myGoals.length} completed today`}
             </p>
           </div>
         )}
