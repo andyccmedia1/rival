@@ -8,7 +8,7 @@ import AvatarPicker from '../components/AvatarPicker'
 export default function Join() {
   const { inviteCode } = useParams()
   const navigate = useNavigate()
-  const { user } = useAuth()
+  const { user, loading: authLoading } = useAuth()
   const [challenge, setChallenge] = useState(null)
   const [challenger, setChallenger] = useState(null)
   const [step, setStep] = useState(1)
@@ -57,7 +57,7 @@ export default function Join() {
       setLoading(false)
     }
     load()
-  }, [inviteCode])
+  }, [inviteCode, user])
 
   const toggleGoal = (id) => {
     setGoals(g => g.includes(id) ? g.filter(x => x !== id) : [...g, id])
@@ -108,7 +108,7 @@ export default function Join() {
     }
   }
 
-  if (loading) return (
+  if (loading || authLoading) return (
     <div className="page" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <p style={{ color: 'var(--text-muted)', fontWeight: 700 }}>Loading challenge...</p>
     </div>
@@ -119,6 +119,25 @@ export default function Join() {
       <div style={{ fontSize: 60 }}>😢</div>
       <h2 style={{ marginTop: 16 }}>{error}</h2>
       <button className="btn-primary" style={{ marginTop: 24 }} onClick={() => navigate('/')}>Go home</button>
+    </div>
+  )
+
+  if (!user) return (
+    <div className="page" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', paddingTop: 60 }}>
+      <div className="animate-float" style={{ fontSize: 56, marginBottom: 14, filter: 'drop-shadow(0 8px 24px rgba(40,20,80,0.4))' }}>⚔️</div>
+      <h1 style={{ color: 'var(--white)', fontSize: 34, marginBottom: 8 }}>You've been challenged!</h1>
+      {challenger && (
+        <p style={{ color: 'var(--text-soft)', fontWeight: 500, marginBottom: 4, fontSize: 16 }}>
+          {challenger.avatar_emoji} <strong>{challenger.display_name}</strong> wants a {challenge.duration_days}-day battle
+        </p>
+      )}
+      <p style={{ color: 'var(--text-muted)', fontSize: 14, marginBottom: 32, maxWidth: 300, lineHeight: 1.5 }}>
+        Sign in to accept — so you can track this challenge from any device, anytime.
+      </p>
+      <button className="btn-primary" style={{ width: '100%', maxWidth: 320 }}
+        onClick={() => navigate(`/login?redirect=/join/${inviteCode}`)}>
+        ✉️ Sign in to accept
+      </button>
     </div>
   )
 
