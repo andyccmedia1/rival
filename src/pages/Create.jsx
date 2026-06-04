@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { format, differenceInDays } from 'date-fns'
 import { supabase, GOAL_OPTIONS, AVATARS } from '../lib/supabase'
+import { useAuth } from '../lib/AuthContext'
 import GoalPicker from '../components/GoalPicker'
 import AvatarPicker from '../components/AvatarPicker'
 import DateRangePicker from '../components/DateRangePicker'
@@ -11,6 +12,7 @@ const CUSTOM_EMOJIS = ['⭐', '🎯', '💡', '🔥', '🌟', '💪', '🎨', '�
 
 export default function Create() {
   const navigate = useNavigate()
+  const { user } = useAuth()
   const [step, setStep] = useState(1)
   const [name, setName] = useState('')
   const [avatar, setAvatar] = useState(AVATARS[0])
@@ -93,6 +95,7 @@ export default function Create() {
         avatar_emoji: avatar,
         slot: 1,
         goal_ids: savedGoals.map(g => g.id),
+        ...(user ? { user_id: user.id } : {}),
       })
       if (pErr) throw pErr
 

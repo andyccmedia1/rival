@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import { useAuth } from '../lib/AuthContext'
 import { format, differenceInDays, isToday, parseISO } from 'date-fns'
 import CheckInCard from '../components/CheckInCard'
 import Scoreboard from '../components/Scoreboard'
@@ -9,6 +10,7 @@ import InviteBanner from '../components/InviteBanner'
 export default function Dashboard() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { user } = useAuth()
   const [challenge, setChallenge] = useState(null)
   const [players, setPlayers] = useState([])
   const [myGoals, setMyGoals] = useState([])
@@ -27,7 +29,7 @@ export default function Dashboard() {
     const { data: ps } = await supabase.from('players').select('*').eq('challenge_id', id)
     setPlayers(ps || [])
 
-    const me = ps?.find(p => p.slot === local?.slot)
+    const me = ps?.find(p => (user && p.user_id === user.id) || p.slot === local?.slot)
     setMyPlayer(me || null)
 
     if (me) {
@@ -92,7 +94,7 @@ export default function Dashboard() {
     </div>
   )
 
-  if (!local) return (
+  if (!local && !myPlayer) return (
     <div className="page" style={{ textAlign: 'center', paddingTop: 80 }}>
       <div style={{ fontSize: 60 }}>🔒</div>
       <h2 style={{ marginTop: 16 }}>You're not in this challenge</h2>
@@ -105,7 +107,8 @@ export default function Dashboard() {
   const daysTotal = challenge.duration_days
   const daysPassed = daysTotal - daysLeft
 
-  const partner = players.find(p => p.slot !== local?.slot)
+  const mySlot = myPlayer?.slot ?? local?.slot
+  const partner = players.find(p => p.slot !== mySlot)
   const waiting = challenge.status === 'pending'
 
   return (
@@ -144,7 +147,7 @@ export default function Dashboard() {
         players={players}
         allCheckIns={allCheckIns}
         myGoals={myGoals}
-        mySlot={local?.slot}
+        mySlot={mySlot}
         challenge={challenge}
       />
 

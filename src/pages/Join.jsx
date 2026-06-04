@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { supabase, GOAL_OPTIONS, AVATARS } from '../lib/supabase'
+import { useAuth } from '../lib/AuthContext'
 import GoalPicker from '../components/GoalPicker'
 import AvatarPicker from '../components/AvatarPicker'
 
 export default function Join() {
   const { inviteCode } = useParams()
   const navigate = useNavigate()
+  const { user } = useAuth()
   const [challenge, setChallenge] = useState(null)
   const [challenger, setChallenger] = useState(null)
   const [step, setStep] = useState(1)
@@ -37,6 +39,16 @@ export default function Join() {
 
       const existing = localStorage.getItem(`rival_player_${c.id}`)
       if (existing) { navigate(`/challenge/${c.id}`); return }
+
+      if (user) {
+        const { data: myPlayer } = await supabase
+          .from('players')
+          .select('*')
+          .eq('challenge_id', c.id)
+          .eq('user_id', user.id)
+          .maybeSingle()
+        if (myPlayer) { navigate(`/challenge/${c.id}`); return }
+      }
 
       setChallenge(c)
       setChallenger(players?.[0] || null)
@@ -74,6 +86,7 @@ export default function Join() {
         avatar_emoji: avatar,
         slot: 2,
         goal_ids: savedGoals.map(g => g.id),
+        ...(user ? { user_id: user.id } : {}),
       })
       if (pErr) throw pErr
 
