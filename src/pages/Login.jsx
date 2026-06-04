@@ -24,14 +24,14 @@ export default function Login() {
 
   if (sent) return (
     <div className="page" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', paddingTop: 80 }}>
-      <div style={{ fontSize: 64 }}>📬</div>
-      <h2 style={{ marginTop: 16, fontSize: 28 }}>Check your email!</h2>
-      <p style={{ color: 'var(--text-muted)', fontWeight: 600, marginTop: 8, maxWidth: 280 }}>
-        We sent a magic link to <strong>{email}</strong>. Click it to sign in.
+      <div style={{ fontSize: 48, marginBottom: 16 }}>📡</div>
+      <h2 style={{ fontSize: 32, letterSpacing: 2, color: 'var(--cyan)' }}>LINK SENT</h2>
+      <p style={{ color: 'var(--text-muted)', fontWeight: 500, marginTop: 12, maxWidth: 280, lineHeight: 1.6 }}>
+        Magic link sent to <span style={{ color: 'var(--text)' }}>{email}</span>.<br />Check your inbox.
       </p>
-      <button style={{ marginTop: 32, background: 'none', border: 'none', color: 'var(--purple)', fontWeight: 700, fontSize: 15, cursor: 'pointer' }}
+      <button style={{ marginTop: 32, background: 'none', border: 'none', color: 'var(--cyan)', fontWeight: 600, fontSize: 13, cursor: 'pointer', letterSpacing: 1, textTransform: 'uppercase' }}
         onClick={() => setSent(false)}>
-        ← Try a different email
+        ← Different email
       </button>
     </div>
   )
@@ -39,18 +39,21 @@ export default function Login() {
   return (
     <div className="page" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', paddingTop: 60 }}>
       <button onClick={() => navigate('/')}
-        style={{ alignSelf: 'flex-start', background: 'none', border: 'none', fontSize: 24, marginBottom: 24, cursor: 'pointer', color: 'var(--text)' }}>
+        style={{ alignSelf: 'flex-start', background: 'none', border: 'none', fontSize: 20, marginBottom: 24, cursor: 'pointer', color: 'var(--text-muted)' }}>
         ←
       </button>
 
-      <div style={{ fontSize: 64, marginBottom: 8 }}>⚔️</div>
-      <h1 style={{ fontSize: 36, color: 'var(--pink)', marginBottom: 8 }}>Sign in to Rival</h1>
-      <p style={{ color: 'var(--text-muted)', fontWeight: 600, marginBottom: 40, textAlign: 'center' }}>
-        We'll email you a magic link — no password needed.
+      <div style={{ fontSize: 48, marginBottom: 16 }}>⚔️</div>
+      <h1 style={{ fontSize: 40, letterSpacing: 4, marginBottom: 6,
+        background: 'linear-gradient(135deg, #00D4FF, #8B5CF6)',
+        WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+      }}>RIVAL</h1>
+      <p style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 40, textAlign: 'center', letterSpacing: 0.5 }}>
+        Enter your email to receive a magic sign-in link.
       </p>
 
       <div style={{ width: '100%', maxWidth: 320 }}>
-        <label style={{ fontWeight: 700, fontSize: 15, display: 'block', marginBottom: 8 }}>Your email</label>
+        <label style={{ fontWeight: 600, fontSize: 11, display: 'block', marginBottom: 8, letterSpacing: 1.2, textTransform: 'uppercase', color: 'var(--text-muted)' }}>Email address</label>
         <input
           type="email"
           value={email}
@@ -59,9 +62,9 @@ export default function Login() {
           onKeyDown={e => e.key === 'Enter' && handleSend()}
           autoFocus
         />
-        {error && <p style={{ color: 'var(--coral)', fontWeight: 700, marginTop: 8 }}>{error}</p>}
+        {error && <p style={{ color: 'var(--red)', fontWeight: 600, marginTop: 8, fontSize: 13 }}>{error}</p>}
         <button className="btn-primary" style={{ width: '100%', marginTop: 16 }} onClick={handleSend} disabled={loading}>
-          {loading ? 'Sending...' : '✉️ Send magic link'}
+          {loading ? 'SENDING...' : 'SEND MAGIC LINK'}
         </button>
       </div>
     </div>

@@ -18,8 +18,8 @@ export default function Scoreboard({ players, allCheckIns, allGoals = [], mySlot
 
   return (
     <div className="card" style={{ padding: 16 }}>
-      <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 14 }}>
-        Battle standings
+      <p style={{ fontSize: 11, fontWeight: 600, color: 'var(--cyan)', textTransform: 'uppercase', letterSpacing: 2, marginBottom: 14 }}>
+        ◈ Battle Standings
       </p>
 
       <div style={{ display: 'flex', gap: 10 }}>
@@ -44,8 +44,9 @@ export default function Scoreboard({ players, allCheckIns, allGoals = [], mySlot
           return (
             <div key={p.id} style={{
               flex: 1, padding: '14px 12px', borderRadius: 'var(--radius-sm)',
-              background: isMe ? 'var(--purple-light)' : 'var(--surface)',
-              border: `2px solid ${leading ? 'var(--yellow)' : isMe ? 'var(--purple)' : 'var(--border)'}`,
+              background: isMe ? 'var(--purple-dim)' : 'var(--surface2)',
+              border: `1px solid ${leading ? 'var(--yellow)' : isMe ? 'var(--purple)' : 'var(--border)'}`,
+              boxShadow: isMe ? '0 0 20px var(--purple-glow)' : 'none',
               textAlign: 'center', position: 'relative',
             }}>
               {leading && (
@@ -62,20 +63,21 @@ export default function Scoreboard({ players, allCheckIns, allGoals = [], mySlot
               <p style={{ fontWeight: 800, fontSize: 14, marginBottom: 8, color: isMe ? 'var(--navy-mid)' : 'var(--text)' }}>{p.display_name}</p>
 
               <div style={{
-                background: 'rgba(0,0,0,0.08)', borderRadius: 99, height: 8, marginBottom: 6,
+                background: 'rgba(255,255,255,0.05)', borderRadius: 2, height: 3, marginBottom: 8,
               }}>
                 <div style={{
-                  background: isMe ? 'var(--purple)' : 'var(--coral)',
-                  height: '100%', borderRadius: 99,
+                  background: isMe ? 'var(--purple)' : 'var(--cyan)',
+                  height: '100%', borderRadius: 2,
                   width: `${score.pct}%`,
                   transition: 'width 0.6s ease',
+                  boxShadow: isMe ? '0 0 6px var(--purple-glow)' : '0 0 6px var(--cyan-glow)',
                 }} />
               </div>
-              <p style={{ fontWeight: 900, fontSize: 22, color: isMe ? 'var(--purple)' : 'var(--coral)' }}>
+              <p style={{ fontWeight: 700, fontSize: 24, color: isMe ? 'var(--purple)' : 'var(--cyan)', fontFamily: 'Rajdhani, sans-serif' }}>
                 {score.pct}%
               </p>
-              <p style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600 }}>
-                {score.count} / {score.total} done
+              <p style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 500, letterSpacing: 0.5 }}>
+                {score.count} / {score.total}
               </p>
             </div>
           )

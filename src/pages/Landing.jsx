@@ -37,10 +37,14 @@ export default function Landing() {
   return (
     <div className="page" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', paddingTop: 60 }}>
 
-      <div className="animate-float" style={{ fontSize: 80, marginBottom: 8, lineHeight: 1 }}>⚔️</div>
-      <h1 style={{ fontSize: 52, color: 'var(--pink)', marginBottom: 8 }}>Rival</h1>
-      <p style={{ fontSize: 18, color: 'var(--text-muted)', fontWeight: 600, marginBottom: 36 }}>
-        Challenge your partner.<br />Stay the course. Win glory.
+      <div className="animate-float" style={{ fontSize: 64, marginBottom: 12, lineHeight: 1 }}>⚔️</div>
+      <h1 style={{
+        fontSize: 56, marginBottom: 8, letterSpacing: 4,
+        background: 'linear-gradient(135deg, #00D4FF, #8B5CF6)',
+        WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+      }}>RIVAL</h1>
+      <p style={{ fontSize: 14, color: 'var(--text-muted)', fontWeight: 500, marginBottom: 36, letterSpacing: 2, textTransform: 'uppercase' }}>
+        Challenge your partner. Stay the course. Win glory.
       </p>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: '100%', maxWidth: 320 }}>
@@ -50,21 +54,22 @@ export default function Landing() {
 
         {!user ? (
           <button onClick={() => navigate('/login')} style={{
-            background: 'none', border: '2px solid var(--border)',
-            borderRadius: 'var(--radius)', padding: '12px 20px',
-            fontWeight: 700, fontSize: 15, cursor: 'pointer', color: 'var(--text)',
+            background: 'transparent', border: '1px solid var(--border-strong)',
+            borderRadius: 'var(--radius-sm)', padding: '12px 20px',
+            fontWeight: 600, fontSize: 14, cursor: 'pointer', color: 'var(--text-dim)',
+            letterSpacing: 0.3,
           }}>
             Sign in to track your challenges
           </button>
         ) : (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 0' }}>
-            <p style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 600 }}>
-              Signed in as {user.email}
+            <p style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 500, letterSpacing: 0.5 }}>
+              {user.email}
             </p>
             <button onClick={handleSignOut} style={{
-              background: 'none', border: 'none', color: 'var(--coral)',
-              fontWeight: 700, fontSize: 13, cursor: 'pointer',
-            }}>Sign out</button>
+              background: 'none', border: 'none', color: 'var(--red)',
+              fontWeight: 600, fontSize: 12, cursor: 'pointer', letterSpacing: 0.3,
+            }}>SIGN OUT</button>
           </div>
         )}
 
@@ -75,7 +80,7 @@ export default function Landing() {
 
       {user && (
         <div style={{ width: '100%', marginTop: 40, textAlign: 'left' }}>
-          <h2 style={{ fontSize: 20, marginBottom: 16 }}>My challenges</h2>
+          <h2 style={{ fontSize: 18, marginBottom: 16, letterSpacing: 2, color: 'var(--cyan)', textTransform: 'uppercase' }}>My Challenges</h2>
           {loadingChallenges ? (
             <p style={{ color: 'var(--text-muted)', fontWeight: 600 }}>Loading...</p>
           ) : challenges.length === 0 ? (
@@ -87,8 +92,8 @@ export default function Landing() {
               {challenges.map(p => {
                 const c = p.challenges
                 if (!c) return null
-                const statusColor = c.status === 'active' ? 'var(--teal)' : c.status === 'complete' ? 'var(--purple)' : 'var(--text-muted)'
-                const statusLabel = c.status === 'active' ? '🟢 Active' : c.status === 'complete' ? '🏆 Complete' : '⏳ Waiting'
+                const statusColor = c.status === 'active' ? 'var(--green)' : c.status === 'complete' ? 'var(--purple)' : 'var(--text-muted)'
+                const statusLabel = c.status === 'active' ? 'ACTIVE' : c.status === 'complete' ? 'COMPLETE' : 'WAITING'
                 return (
                   <div key={p.id} className="card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
                     <div style={{ flex: 1, cursor: 'pointer' }} onClick={() => navigate(`/challenge/${c.id}`)}>
@@ -123,28 +128,31 @@ export default function Landing() {
         </div>
       )}
 
-      <div style={{ marginTop: 48, display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, width: '100%' }}>
+      <div style={{ marginTop: 48, display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, width: '100%' }}>
         {[
-          { icon: '🎯', label: 'Set goals' },
-          { icon: '✅', label: 'Daily check-ins' },
-          { icon: '🏆', label: 'Winner revealed' },
+          { icon: '⚡', label: 'Set goals' },
+          { icon: '◈', label: 'Daily check-ins' },
+          { icon: '◉', label: 'Winner revealed' },
         ].map(({ icon, label }) => (
           <div key={label} className="card" style={{ textAlign: 'center', padding: '16px 8px' }}>
-            <div style={{ fontSize: 28, marginBottom: 6 }}>{icon}</div>
-            <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-muted)' }}>{label}</p>
+            <div style={{ fontSize: 22, marginBottom: 6, color: 'var(--cyan)' }}>{icon}</div>
+            <p style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', letterSpacing: 1, textTransform: 'uppercase' }}>{label}</p>
           </div>
         ))}
       </div>
 
-      <div style={{ marginTop: 48, display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center' }}>
-        {['📖 Read', '🏃 Exercise', '💧 Hydrate', '🧘 Meditate', '🌙 Sleep', '🥗 Eat clean'].map(g => (
+      <div style={{ marginTop: 32, display: 'flex', gap: 6, flexWrap: 'wrap', justifyContent: 'center' }}>
+        {['Read', 'Exercise', 'Hydrate', 'Meditate', 'Sleep', 'Eat clean'].map(g => (
           <span key={g} style={{
-            background: 'var(--purple-light)',
-            color: 'var(--navy-mid)',
-            padding: '6px 14px',
-            borderRadius: 'var(--radius-pill)',
-            fontSize: 13,
-            fontWeight: 700,
+            background: 'var(--cyan-dim)',
+            color: 'var(--cyan)',
+            border: '1px solid rgba(0,212,255,0.2)',
+            padding: '4px 12px',
+            borderRadius: 'var(--radius-sm)',
+            fontSize: 11,
+            fontWeight: 600,
+            letterSpacing: 0.8,
+            textTransform: 'uppercase',
           }}>{g}</span>
         ))}
       </div>
