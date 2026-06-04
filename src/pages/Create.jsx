@@ -58,6 +58,10 @@ export default function Create() {
     setCustomGoals(prev => prev.filter(g => g.id !== id))
   }
 
+  const updateCustomGoalFreq = (id, freq) => {
+    setCustomGoals(prev => prev.map(g => g.id === id ? { ...g, timesPerWeek: freq } : g))
+  }
+
   const handleCreate = async () => {
     if (!name.trim()) return setError('Enter your name!')
     if (!startDate || !endDate) return setError('Pick a start and end date!')
@@ -192,16 +196,30 @@ export default function Create() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 10 }}>
                 {customGoals.map(g => (
                   <div key={g.id} style={{
-                    display: 'flex', alignItems: 'center', gap: 10,
                     background: g.color + '14', border: `2px solid ${g.color}`,
                     borderRadius: 'var(--radius-sm)', padding: '10px 12px',
                   }}>
-                    <span style={{ fontSize: 20 }}>{g.emoji}</span>
-                    <span style={{ fontWeight: 700, flex: 1, color: g.color }}>{g.label}</span>
-                    <button onClick={() => removeCustomGoal(g.id)} style={{
-                      background: 'none', border: 'none', fontSize: 20,
-                      color: 'var(--text-muted)', padding: '0 4px', lineHeight: 1, cursor: 'pointer',
-                    }}>×</button>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                      <span style={{ fontSize: 20 }}>{g.emoji}</span>
+                      <span style={{ fontWeight: 700, flex: 1, color: g.color }}>{g.label}</span>
+                      <button onClick={() => removeCustomGoal(g.id)} style={{
+                        background: 'none', border: 'none', fontSize: 20,
+                        color: 'var(--text-muted)', padding: '0 4px', lineHeight: 1, cursor: 'pointer',
+                      }}>×</button>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: g.color }}>days/week:</span>
+                      {[1,2,3,4,5,6,7].map(n => (
+                        <button key={n} onClick={() => updateCustomGoalFreq(g.id, n)} style={{
+                          width: 26, height: 26, borderRadius: '50%',
+                          border: `2px solid ${n === (g.timesPerWeek || 7) ? g.color : 'var(--border)'}`,
+                          background: n === (g.timesPerWeek || 7) ? g.color : 'white',
+                          color: n === (g.timesPerWeek || 7) ? 'white' : 'var(--text)',
+                          fontWeight: 800, fontSize: 11, cursor: 'pointer',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        }}>{n}</button>
+                      ))}
+                    </div>
                   </div>
                 ))}
               </div>
