@@ -196,19 +196,20 @@ export default function Create() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 10 }}>
                 {customGoals.map(g => (
                   <div key={g.id} style={{
-                    background: g.color + '14', border: `2px solid ${g.color}`,
+                    background: 'rgba(255,255,255,0.12)', border: '1px solid var(--glass-border-strong)',
+                    backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
                     borderRadius: 'var(--radius-sm)', padding: '10px 12px',
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
                       <span style={{ fontSize: 20 }}>{g.emoji}</span>
-                      <span style={{ fontWeight: 700, flex: 1, color: g.color }}>{g.label}</span>
+                      <span style={{ fontWeight: 600, flex: 1, color: 'var(--white)' }}>{g.label}</span>
                       <button onClick={() => removeCustomGoal(g.id)} style={{
                         background: 'none', border: 'none', fontSize: 20,
-                        color: 'var(--text-muted)', padding: '0 4px', lineHeight: 1, cursor: 'pointer',
+                        color: 'var(--text-soft)', padding: '0 4px', lineHeight: 1, cursor: 'pointer',
                       }}>×</button>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <span style={{ fontSize: 11, fontWeight: 700, color: g.color }}>days/week:</span>
+                      <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-soft)' }}>days/week:</span>
                       {[1,2,3,4,5,6,7].map(n => (
                         <button key={n} onClick={() => updateCustomGoalFreq(g.id, n)} style={{
                           width: 26, height: 26, borderRadius: '50%',
