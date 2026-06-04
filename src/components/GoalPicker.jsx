@@ -16,10 +16,12 @@ export default function GoalPicker({ selected, onToggle, frequencies = {}, onFre
               style={{
                 width: '100%',
                 padding: '14px 12px',
-                borderRadius: active ? 'var(--radius) var(--radius) 0 0' : 'var(--radius)',
-                background: active ? goal.color + '18' : 'var(--white)',
-                border: `2px solid ${active ? goal.color : 'var(--border)'}`,
-                borderBottom: active ? 'none' : `2px solid ${active ? goal.color : 'var(--border)'}`,
+                borderRadius: active ? 'var(--radius-sm) var(--radius-sm) 0 0' : 'var(--radius-sm)',
+                background: active ? 'rgba(255,255,255,0.22)' : 'var(--glass-soft)',
+                backdropFilter: 'blur(12px)',
+                WebkitBackdropFilter: 'blur(12px)',
+                border: `1px solid ${active ? 'var(--glass-border-strong)' : 'var(--glass-border)'}`,
+                borderBottom: active ? 'none' : `1px solid var(--glass-border)`,
                 display: 'flex',
                 alignItems: 'center',
                 gap: 10,
@@ -29,12 +31,12 @@ export default function GoalPicker({ selected, onToggle, frequencies = {}, onFre
             >
               <span style={{ fontSize: 22 }}>{goal.emoji}</span>
               <div style={{ flex: 1 }}>
-                <p style={{ fontWeight: 700, fontSize: 14, color: active ? goal.color : 'var(--text)' }}>
+                <p style={{ fontWeight: 600, fontSize: 14, color: 'var(--white)' }}>
                   {goal.label}
                 </p>
               </div>
               {active && (
-                <span style={{ fontSize: 12, fontWeight: 700, color: goal.color, flexShrink: 0 }}>
+                <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--white)', flexShrink: 0 }}>
                   {freq}×/wk ✓
                 </span>
               )}
@@ -42,16 +44,18 @@ export default function GoalPicker({ selected, onToggle, frequencies = {}, onFre
 
             {active && (
               <div style={{
-                border: `2px solid ${goal.color}`,
+                border: '1px solid var(--glass-border-strong)',
                 borderTop: 'none',
-                borderRadius: '0 0 var(--radius) var(--radius)',
-                background: goal.color + '0C',
+                borderRadius: '0 0 var(--radius-sm) var(--radius-sm)',
+                background: 'rgba(255,255,255,0.12)',
+                backdropFilter: 'blur(12px)',
+                WebkitBackdropFilter: 'blur(12px)',
                 padding: '10px 12px',
                 display: 'flex',
                 alignItems: 'center',
                 gap: 8,
               }}>
-                <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', flexShrink: 0 }}>
+                <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-soft)', flexShrink: 0 }}>
                   days/week:
                 </span>
                 <div style={{ display: 'flex', gap: 6 }}>
@@ -62,10 +66,10 @@ export default function GoalPicker({ selected, onToggle, frequencies = {}, onFre
                       style={{
                         width: 30, height: 30,
                         borderRadius: '50%',
-                        border: `2px solid ${n === freq ? goal.color : 'var(--border)'}`,
-                        background: n === freq ? goal.color : 'white',
-                        color: n === freq ? 'white' : 'var(--text)',
-                        fontWeight: 800,
+                        border: `1px solid ${n === freq ? 'var(--white)' : 'var(--glass-border)'}`,
+                        background: n === freq ? 'var(--white)' : 'rgba(255,255,255,0.08)',
+                        color: n === freq ? '#7B4FB0' : 'var(--white)',
+                        fontWeight: 700,
                         fontSize: 13,
                         cursor: 'pointer',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',

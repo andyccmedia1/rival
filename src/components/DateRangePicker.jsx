@@ -52,31 +52,33 @@ export default function DateRangePicker({ startDate, endDate, onChange }) {
   return (
     <div>
       <div style={{
-        background: 'var(--white)', border: '2px solid var(--border)',
+        background: 'var(--glass)', border: '1px solid var(--glass-border)',
+        backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
         borderRadius: 'var(--radius)', overflow: 'hidden',
+        boxShadow: 'var(--shadow-soft)',
       }}>
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '12px 16px', borderBottom: '1.5px solid var(--border)',
-          background: 'var(--purple-light)',
+          padding: '12px 16px', borderBottom: '1px solid var(--glass-border)',
+          background: 'rgba(255,255,255,0.08)',
         }}>
           <button onClick={() => setViewMonth(m => subMonths(m, 1))} style={{
             background: 'none', border: 'none', fontSize: 20, cursor: 'pointer',
-            color: 'var(--purple)', fontWeight: 900, padding: '0 8px',
+            color: 'var(--white)', fontWeight: 900, padding: '0 8px',
           }}>‹</button>
-          <span style={{ fontWeight: 800, fontSize: 16, color: 'var(--navy)' }}>
+          <span style={{ fontWeight: 700, fontSize: 16, color: 'var(--white)', fontFamily: 'Sora, sans-serif' }}>
             {format(viewMonth, 'MMMM yyyy')}
           </span>
           <button onClick={() => setViewMonth(m => addMonths(m, 1))} style={{
             background: 'none', border: 'none', fontSize: 20, cursor: 'pointer',
-            color: 'var(--purple)', fontWeight: 900, padding: '0 8px',
+            color: 'var(--white)', fontWeight: 900, padding: '0 8px',
           }}>›</button>
         </div>
 
         <div style={{ padding: '12px' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 2, marginBottom: 4 }}>
             {['Su','Mo','Tu','We','Th','Fr','Sa'].map(d => (
-              <div key={d} style={{ textAlign: 'center', fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', padding: '4px 0' }}>{d}</div>
+              <div key={d} style={{ textAlign: 'center', fontSize: 11, fontWeight: 700, color: 'var(--text-soft)', padding: '4px 0' }}>{d}</div>
             ))}
           </div>
 
@@ -99,11 +101,11 @@ export default function DateRangePicker({ startDate, endDate, onChange }) {
                   style={{
                     padding: '7px 2px',
                     borderRadius: (isStart || isEnd) ? '50%' : inRange ? '0' : '50%',
-                    background: isStart || isEnd ? 'var(--purple)' : inRange ? 'var(--purple-light)' : 'transparent',
-                    color: isStart || isEnd ? 'white' : isPast ? 'var(--border)' : todayDay ? 'var(--purple)' : 'var(--text)',
-                    border: todayDay && !isStart && !isEnd ? '2px solid var(--purple)' : '2px solid transparent',
+                    background: isStart || isEnd ? 'var(--white)' : inRange ? 'rgba(255,255,255,0.18)' : 'transparent',
+                    color: isStart || isEnd ? '#7B4FB0' : isPast ? 'var(--text-faint)' : 'var(--white)',
+                    border: todayDay && !isStart && !isEnd ? '2px solid var(--white)' : '2px solid transparent',
                     fontSize: 13,
-                    fontWeight: isStart || isEnd ? 900 : todayDay ? 800 : 600,
+                    fontWeight: isStart || isEnd ? 800 : todayDay ? 700 : 500,
                     cursor: isPast ? 'not-allowed' : 'pointer',
                     transition: 'all 0.1s',
                     width: '100%',
@@ -145,10 +147,11 @@ export default function DateRangePicker({ startDate, endDate, onChange }) {
 
       {diffDays !== null && (
         <div style={{
-          marginTop: 10, textAlign: 'center', padding: '8px',
-          background: 'var(--teal-light)', borderRadius: 'var(--radius-sm)',
+          marginTop: 10, textAlign: 'center', padding: '10px',
+          background: 'rgba(91,233,185,0.18)', border: '1px solid var(--green)',
+          backdropFilter: 'blur(8px)', borderRadius: 'var(--radius-sm)',
         }}>
-          <p style={{ fontWeight: 800, color: '#0F6E56', fontSize: 14 }}>
+          <p style={{ fontWeight: 700, color: 'var(--green)', fontSize: 14 }}>
             🗓️ {diffDays} day challenge
           </p>
         </div>

@@ -212,10 +212,10 @@ export default function Create() {
                       {[1,2,3,4,5,6,7].map(n => (
                         <button key={n} onClick={() => updateCustomGoalFreq(g.id, n)} style={{
                           width: 26, height: 26, borderRadius: '50%',
-                          border: `2px solid ${n === (g.timesPerWeek || 7) ? g.color : 'var(--border)'}`,
-                          background: n === (g.timesPerWeek || 7) ? g.color : 'white',
-                          color: n === (g.timesPerWeek || 7) ? 'white' : 'var(--text)',
-                          fontWeight: 800, fontSize: 11, cursor: 'pointer',
+                          border: `1px solid ${n === (g.timesPerWeek || 7) ? 'var(--white)' : 'var(--glass-border)'}`,
+                          background: n === (g.timesPerWeek || 7) ? 'var(--white)' : 'rgba(255,255,255,0.08)',
+                          color: n === (g.timesPerWeek || 7) ? '#7B4FB0' : 'var(--white)',
+                          fontWeight: 700, fontSize: 11, cursor: 'pointer',
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
                         }}>{n}</button>
                       ))}
@@ -234,20 +234,20 @@ export default function Create() {
                 onKeyDown={e => e.key === 'Enter' && addCustomGoal()}
               />
               <button onClick={addCustomGoal} style={{
-                background: 'var(--navy)', color: 'white',
+                background: 'var(--white)', color: '#7B4FB0',
                 borderRadius: 'var(--radius-sm)', padding: '10px 18px',
                 fontWeight: 900, fontSize: 22, flexShrink: 0, lineHeight: 1,
               }}>+</button>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
-              <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)' }}>days/week:</span>
+              <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-soft)' }}>days/week:</span>
               {[1,2,3,4,5,6,7].map(n => (
                 <button key={n} onClick={() => setCustomFreq(n)} style={{
                   width: 28, height: 28, borderRadius: '50%',
-                  border: `2px solid ${n === customFreq ? 'var(--navy)' : 'var(--border)'}`,
-                  background: n === customFreq ? 'var(--navy)' : 'white',
-                  color: n === customFreq ? 'white' : 'var(--text)',
-                  fontWeight: 800, fontSize: 12, cursor: 'pointer',
+                  border: `1px solid ${n === customFreq ? 'var(--white)' : 'var(--glass-border)'}`,
+                  background: n === customFreq ? 'var(--white)' : 'rgba(255,255,255,0.08)',
+                  color: n === customFreq ? '#7B4FB0' : 'var(--white)',
+                  fontWeight: 700, fontSize: 12, cursor: 'pointer',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
                   {n}

@@ -12,33 +12,32 @@ export default function InviteBanner({ challengeId, inviteCode }) {
   }
 
   return (
-    <div style={{
-      background: 'var(--yellow-light)',
-      border: '2px solid var(--yellow)',
-      borderRadius: 'var(--radius)',
+    <div className="card" style={{
+      background: 'rgba(255,214,107,0.15)',
+      border: '1px solid var(--gold)',
       padding: 16,
       marginBottom: 20,
     }}>
-      <p style={{ fontWeight: 800, fontSize: 15, marginBottom: 4 }}>
+      <p style={{ fontWeight: 700, fontSize: 15, marginBottom: 4, color: 'var(--white)' }}>
         ⏳ Waiting for your opponent...
       </p>
-      <p style={{ color: 'var(--text-muted)', fontWeight: 600, fontSize: 13, marginBottom: 12 }}>
+      <p style={{ color: 'var(--text-soft)', fontWeight: 500, fontSize: 13, marginBottom: 12 }}>
         Share this link to invite them:
       </p>
       <div style={{ display: 'flex', gap: 8 }}>
         <div style={{
-          flex: 1, background: 'var(--white)', borderRadius: 'var(--radius-sm)',
-          padding: '8px 12px', fontSize: 13, fontWeight: 600,
-          border: '1.5px solid var(--border)',
+          flex: 1, background: 'rgba(255,255,255,0.1)', borderRadius: 'var(--radius-sm)',
+          padding: '10px 12px', fontSize: 13, fontWeight: 500,
+          border: '1px solid var(--glass-border)',
           overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-          color: 'var(--text-muted)',
+          color: 'var(--white)',
         }}>
           {url}
         </div>
         <button onClick={handleCopy} style={{
-          background: copied ? 'var(--teal)' : 'var(--navy)',
-          color: 'white', borderRadius: 'var(--radius-sm)',
-          padding: '8px 14px', fontSize: 13, fontWeight: 800, flexShrink: 0,
+          background: copied ? 'var(--green)' : 'var(--white)',
+          color: copied ? '#08402F' : '#7B4FB0', borderRadius: 'var(--radius-sm)',
+          padding: '8px 16px', fontSize: 13, fontWeight: 700, flexShrink: 0,
           transition: 'background 0.2s',
         }}>
           {copied ? '✓ Copied!' : 'Copy'}

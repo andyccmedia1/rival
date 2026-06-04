@@ -184,14 +184,14 @@ export default function Join() {
             <input value={customGoal} onChange={e => setCustomGoal(e.target.value)}
               placeholder="e.g. No social media" maxLength={30} />
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
-              <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)' }}>days/week:</span>
+              <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-soft)' }}>days/week:</span>
               {[1,2,3,4,5,6,7].map(n => (
                 <button key={n} onClick={() => setCustomFreq(n)} style={{
                   width: 28, height: 28, borderRadius: '50%',
-                  border: `2px solid ${n === customFreq ? 'var(--navy)' : 'var(--border)'}`,
-                  background: n === customFreq ? 'var(--navy)' : 'white',
-                  color: n === customFreq ? 'white' : 'var(--text)',
-                  fontWeight: 800, fontSize: 12, cursor: 'pointer',
+                  border: `1px solid ${n === customFreq ? 'var(--white)' : 'var(--glass-border)'}`,
+                  background: n === customFreq ? 'var(--white)' : 'rgba(255,255,255,0.08)',
+                  color: n === customFreq ? '#7B4FB0' : 'var(--white)',
+                  fontWeight: 700, fontSize: 12, cursor: 'pointer',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
                   {n}
