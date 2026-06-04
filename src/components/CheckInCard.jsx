@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-export default function CheckInCard({ goal, checked, onToggle }) {
+export default function CheckInCard({ goal, checked, onToggle, weeklyCount = 0, weeklyTarget = 7 }) {
   const [animating, setAnimating] = useState(false)
 
   const handleClick = () => {
@@ -10,6 +10,9 @@ export default function CheckInCard({ goal, checked, onToggle }) {
     }
     onToggle()
   }
+
+  const weeklyDone = weeklyCount >= weeklyTarget
+  const isDaily = weeklyTarget === 7
 
   return (
     <button
@@ -33,6 +36,14 @@ export default function CheckInCard({ goal, checked, onToggle }) {
         <p style={{ fontWeight: 700, fontSize: 15, color: checked ? goal.color : 'var(--text)' }}>
           {goal.label}
         </p>
+        {!isDaily && (
+          <p style={{
+            fontSize: 12, fontWeight: 700, marginTop: 2,
+            color: weeklyDone ? '#0F6E56' : 'var(--text-muted)',
+          }}>
+            {weeklyDone ? '✅' : `${weeklyCount}/${weeklyTarget}`} this week
+          </p>
+        )}
       </div>
 
       <div style={{

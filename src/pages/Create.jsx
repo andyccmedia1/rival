@@ -19,8 +19,10 @@ export default function Create() {
   const [startDate, setStartDate] = useState(null)
   const [endDate, setEndDate] = useState(null)
   const [goals, setGoals] = useState([])
+  const [goalFrequencies, setGoalFrequencies] = useState({})
   const [customGoals, setCustomGoals] = useState([])
   const [customInput, setCustomInput] = useState('')
+  const [customFreq, setCustomFreq] = useState(7)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -28,6 +30,11 @@ export default function Create() {
 
   const toggleGoal = (id) => {
     setGoals(g => g.includes(id) ? g.filter(x => x !== id) : [...g, id])
+    setGoalFrequencies(f => ({ ...f, [id]: f[id] || 7 }))
+  }
+
+  const handleFrequencyChange = (id, val) => {
+    setGoalFrequencies(f => ({ ...f, [id]: val }))
   }
 
   const addCustomGoal = () => {
@@ -40,8 +47,10 @@ export default function Create() {
       label: val,
       emoji: CUSTOM_EMOJIS[idx % CUSTOM_EMOJIS.length],
       color: CUSTOM_COLORS[idx % CUSTOM_COLORS.length],
+      timesPerWeek: customFreq,
     }])
     setCustomInput('')
+    setCustomFreq(7)
     setError('')
   }
 
@@ -78,10 +87,10 @@ export default function Create() {
       const goalList = [
         ...goals.map(id => {
           const g = GOAL_OPTIONS.find(o => o.id === id)
-          return { challenge_id: challenge.id, label: g.label, emoji: g.emoji, color: g.color, player_slot: 1 }
+          return { challenge_id: challenge.id, label: g.label, emoji: g.emoji, color: g.color, player_slot: 1, times_per_week: goalFrequencies[id] || 7 }
         }),
         ...customGoals.map(g => ({
-          challenge_id: challenge.id, label: g.label, emoji: g.emoji, color: g.color, player_slot: 1
+          challenge_id: challenge.id, label: g.label, emoji: g.emoji, color: g.color, player_slot: 1, times_per_week: g.timesPerWeek || 7
         })),
       ]
 
@@ -166,7 +175,12 @@ export default function Create() {
           <h2 style={{ fontSize: 30, marginBottom: 6 }}>Your daily goals 🎯</h2>
           <p style={{ color: 'var(--text-muted)', marginBottom: 20, fontWeight: 600 }}>What will you commit to each day?</p>
 
-          <GoalPicker selected={goals} onToggle={(id) => { toggleGoal(id); setError('') }} />
+          <GoalPicker
+            selected={goals}
+            onToggle={(id) => { toggleGoal(id); setError('') }}
+            frequencies={goalFrequencies}
+            onFrequencyChange={handleFrequencyChange}
+          />
 
           <div style={{ marginTop: 20 }}>
             <label style={{ fontWeight: 700, fontSize: 15, display: 'block', marginBottom: 10 }}>
@@ -206,6 +220,21 @@ export default function Create() {
                 borderRadius: 'var(--radius-sm)', padding: '10px 18px',
                 fontWeight: 900, fontSize: 22, flexShrink: 0, lineHeight: 1,
               }}>+</button>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
+              <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)' }}>days/week:</span>
+              {[1,2,3,4,5,6,7].map(n => (
+                <button key={n} onClick={() => setCustomFreq(n)} style={{
+                  width: 28, height: 28, borderRadius: '50%',
+                  border: `2px solid ${n === customFreq ? 'var(--navy)' : 'var(--border)'}`,
+                  background: n === customFreq ? 'var(--navy)' : 'white',
+                  color: n === customFreq ? 'white' : 'var(--text)',
+                  fontWeight: 800, fontSize: 12, cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  {n}
+                </button>
+              ))}
             </div>
             <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 6, fontWeight: 600 }}>
               Press Enter or + to add each goal

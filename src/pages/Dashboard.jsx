@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../lib/AuthContext'
-import { format, differenceInDays, isToday, parseISO } from 'date-fns'
+import { format, differenceInDays, parseISO, startOfWeek, endOfWeek } from 'date-fns'
 import CheckInCard from '../components/CheckInCard'
 import Scoreboard from '../components/Scoreboard'
 import InviteBanner from '../components/InviteBanner'
@@ -17,6 +17,7 @@ export default function Dashboard() {
   const [checkIns, setCheckIns] = useState([])
   const [allCheckIns, setAllCheckIns] = useState([])
   const [myPlayer, setMyPlayer] = useState(null)
+  const [allGoals, setAllGoals] = useState([])
   const [loading, setLoading] = useState(true)
 
   const local = JSON.parse(localStorage.getItem(`rival_player_${id}`) || 'null')
@@ -32,9 +33,12 @@ export default function Dashboard() {
     const me = ps?.find(p => (user && p.user_id === user.id) || p.slot === local?.slot)
     setMyPlayer(me || null)
 
+    const { data: allGoalsData } = await supabase.from('goals').select('*').eq('challenge_id', id)
+    setAllGoals(allGoalsData || [])
+
     if (me) {
-      const { data: goals } = await supabase.from('goals').select('*').in('id', me.goal_ids || [])
-      setMyGoals(goals || [])
+      const goals = (allGoalsData || []).filter(g => (me.goal_ids || []).includes(g.id))
+      setMyGoals(goals)
 
       const today = format(new Date(), 'yyyy-MM-dd')
       const { data: ci } = await supabase.from('check_ins')
@@ -103,6 +107,17 @@ export default function Dashboard() {
   )
 
   const today = format(new Date(), 'yyyy-MM-dd')
+  const weekStart = format(startOfWeek(new Date(), { weekStartsOn: 1 }), 'yyyy-MM-dd')
+  const weekEnd = format(endOfWeek(new Date(), { weekStartsOn: 1 }), 'yyyy-MM-dd')
+
+  const getWeeklyCount = (goalId) =>
+    allCheckIns.filter(ci =>
+      ci.goal_id === goalId &&
+      ci.player_id === myPlayer?.id &&
+      ci.date >= weekStart &&
+      ci.date <= weekEnd
+    ).length
+
   const daysLeft = differenceInDays(parseISO(challenge.end_date), new Date()) + 1
   const daysTotal = challenge.duration_days
   const daysPassed = daysTotal - daysLeft
@@ -146,7 +161,7 @@ export default function Dashboard() {
       <Scoreboard
         players={players}
         allCheckIns={allCheckIns}
-        myGoals={myGoals}
+        allGoals={allGoals}
         mySlot={mySlot}
         challenge={challenge}
       />
@@ -167,6 +182,8 @@ export default function Dashboard() {
                 goal={goal}
                 checked={!!checkIns.find(ci => ci.goal_id === goal.id)}
                 onToggle={() => handleCheckIn(goal.id)}
+                weeklyCount={getWeeklyCount(goal.id)}
+                weeklyTarget={goal.times_per_week || 7}
               />
             ))}
           </div>

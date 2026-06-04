@@ -15,7 +15,9 @@ export default function Join() {
   const [name, setName] = useState('')
   const [avatar, setAvatar] = useState(AVATARS[3])
   const [goals, setGoals] = useState([])
+  const [goalFrequencies, setGoalFrequencies] = useState({})
   const [customGoal, setCustomGoal] = useState('')
+  const [customFreq, setCustomFreq] = useState(7)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
@@ -59,6 +61,11 @@ export default function Join() {
 
   const toggleGoal = (id) => {
     setGoals(g => g.includes(id) ? g.filter(x => x !== id) : [...g, id])
+    setGoalFrequencies(f => ({ ...f, [id]: f[id] || 7 }))
+  }
+
+  const handleFrequencyChange = (id, val) => {
+    setGoalFrequencies(f => ({ ...f, [id]: val }))
   }
 
   const handleJoin = async () => {
@@ -71,9 +78,9 @@ export default function Join() {
       const goalList = [
         ...goals.map(id => {
           const g = GOAL_OPTIONS.find(o => o.id === id)
-          return { challenge_id: challenge.id, label: g.label, emoji: g.emoji, color: g.color, player_slot: 2 }
+          return { challenge_id: challenge.id, label: g.label, emoji: g.emoji, color: g.color, player_slot: 2, times_per_week: goalFrequencies[id] || 7 }
         }),
-        ...(customGoal.trim() ? [{ challenge_id: challenge.id, label: customGoal.trim(), emoji: '⭐', color: '#BA7517', player_slot: 2 }] : [])
+        ...(customGoal.trim() ? [{ challenge_id: challenge.id, label: customGoal.trim(), emoji: '⭐', color: '#BA7517', player_slot: 2, times_per_week: customFreq }] : [])
       ]
 
       const { data: savedGoals, error: gErr } = await supabase
@@ -165,12 +172,32 @@ export default function Join() {
           <h2 style={{ fontSize: 28, marginBottom: 6 }}>Your daily goals 🎯</h2>
           <p style={{ color: 'var(--text-muted)', marginBottom: 24, fontWeight: 600 }}>Pick what you'll commit to</p>
 
-          <GoalPicker selected={goals} onToggle={toggleGoal} />
+          <GoalPicker
+            selected={goals}
+            onToggle={toggleGoal}
+            frequencies={goalFrequencies}
+            onFrequencyChange={handleFrequencyChange}
+          />
 
           <div style={{ marginTop: 16 }}>
             <label style={{ fontWeight: 700, fontSize: 15, display: 'block', marginBottom: 8 }}>Custom goal (optional)</label>
             <input value={customGoal} onChange={e => setCustomGoal(e.target.value)}
               placeholder="e.g. No social media" maxLength={30} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
+              <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)' }}>days/week:</span>
+              {[1,2,3,4,5,6,7].map(n => (
+                <button key={n} onClick={() => setCustomFreq(n)} style={{
+                  width: 28, height: 28, borderRadius: '50%',
+                  border: `2px solid ${n === customFreq ? 'var(--navy)' : 'var(--border)'}`,
+                  background: n === customFreq ? 'var(--navy)' : 'white',
+                  color: n === customFreq ? 'white' : 'var(--text)',
+                  fontWeight: 800, fontSize: 12, cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  {n}
+                </button>
+              ))}
+            </div>
           </div>
 
           {error && <p style={{ color: 'var(--coral)', marginBottom: 12, fontWeight: 700, textAlign: 'center' }}>{error}</p>}

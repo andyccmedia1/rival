@@ -1,11 +1,14 @@
 import { format, eachDayOfInterval, parseISO } from 'date-fns'
 
-export default function Scoreboard({ players, allCheckIns, mySlot, challenge }) {
+export default function Scoreboard({ players, allCheckIns, allGoals = [], mySlot, challenge }) {
   if (!players || players.length === 0) return null
+
+  const weeksInChallenge = Math.max(1, Math.ceil(challenge.duration_days / 7))
 
   const getScore = (player) => {
     const ci = allCheckIns.filter(c => c.player_id === player.id)
-    const total = (player.goal_ids?.length || 0) * challenge.duration_days
+    const playerGoals = allGoals.filter(g => (player.goal_ids || []).includes(g.id))
+    const total = playerGoals.reduce((sum, g) => sum + (g.times_per_week || 7) * weeksInChallenge, 0)
     const pct = total > 0 ? Math.round((ci.length / total) * 100) : 0
     return { count: ci.length, total, pct }
   }
