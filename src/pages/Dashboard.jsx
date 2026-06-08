@@ -20,6 +20,15 @@ export default function Dashboard() {
   const [myPlayer, setMyPlayer] = useState(null)
   const [allGoals, setAllGoals] = useState([])
   const [loading, setLoading] = useState(true)
+  const todayKey = format(new Date(), 'yyyy-MM-dd')
+  const [doneToday, setDoneToday] = useState(
+    () => localStorage.getItem(`rival_done_${id}_${todayKey}`) === '1'
+  )
+
+  const markDoneToday = () => {
+    localStorage.setItem(`rival_done_${id}_${todayKey}`, '1')
+    setDoneToday(true)
+  }
 
   const local = JSON.parse(localStorage.getItem(`rival_player_${id}`) || 'null')
 
@@ -229,21 +238,44 @@ export default function Dashboard() {
         )}
 
         {myGoals.length > 0 && (
-          <div style={{
-            marginTop: 16, textAlign: 'center', padding: 14,
-            background: checkIns.length === myGoals.length ? 'rgba(91,233,185,0.18)' : 'var(--glass-soft)',
-            border: `1px solid ${checkIns.length === myGoals.length ? 'var(--green)' : 'var(--glass-border)'}`,
-            borderRadius: 'var(--radius-sm)',
-            backdropFilter: 'blur(8px)',
-            transition: 'all 0.4s',
-          }}>
-            <p style={{ fontWeight: 600, fontSize: 14,
-              color: checkIns.length === myGoals.length ? 'var(--green)' : 'var(--text-soft)' }}>
-              {checkIns.length === myGoals.length
-                ? '🎉 All done for today! Keep it up!'
-                : `${checkIns.length} / ${myGoals.length} completed today`}
+          <>
+            <p style={{ textAlign: 'center', fontSize: 12, color: 'var(--text-muted)', marginTop: 14 }}>
+              ✓ Each tap saves automatically
             </p>
-          </div>
+
+            {doneToday ? (
+              <div style={{
+                marginTop: 12, textAlign: 'center', padding: 16,
+                background: 'rgba(91,233,185,0.18)', border: '1px solid var(--green)',
+                borderRadius: 'var(--radius-sm)', backdropFilter: 'blur(8px)',
+              }}>
+                <p style={{ fontWeight: 700, fontSize: 15, color: 'var(--green)' }}>
+                  {checkIns.length === myGoals.length
+                    ? '🎉 Locked in — all goals done today!'
+                    : `✅ Logged for today · ${checkIns.length}/${myGoals.length} done`}
+                </p>
+                <button onClick={() => { localStorage.removeItem(`rival_done_${id}_${todayKey}`); setDoneToday(false) }}
+                  style={{ marginTop: 8, background: 'none', border: 'none', color: 'var(--text-soft)', fontWeight: 600, fontSize: 13, cursor: 'pointer' }}>
+                  Edit today's check-in
+                </button>
+              </div>
+            ) : (
+              <>
+                <div style={{
+                  marginTop: 12, textAlign: 'center', padding: 12,
+                  background: 'var(--glass-soft)', border: '1px solid var(--glass-border)',
+                  borderRadius: 'var(--radius-sm)',
+                }}>
+                  <p style={{ fontWeight: 600, fontSize: 14, color: 'var(--text-soft)' }}>
+                    {checkIns.length} / {myGoals.length} completed today
+                  </p>
+                </div>
+                <button className="btn-primary" style={{ width: '100%', marginTop: 12 }} onClick={markDoneToday}>
+                  {checkIns.length === myGoals.length ? '🎉 Done for today!' : '✓ Done for today'}
+                </button>
+              </>
+            )}
+          </>
         )}
       </div>
       )}
