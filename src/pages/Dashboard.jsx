@@ -5,6 +5,7 @@ import { useAuth } from '../lib/AuthContext'
 import { format, differenceInDays, parseISO, startOfWeek, endOfWeek } from 'date-fns'
 import CheckInCard from '../components/CheckInCard'
 import Scoreboard from '../components/Scoreboard'
+import BattleCalendar from '../components/BattleCalendar'
 import InviteBanner from '../components/InviteBanner'
 
 export default function Dashboard() {
@@ -173,6 +174,13 @@ export default function Dashboard() {
         allCheckIns={allCheckIns}
         allGoals={allGoals}
         mySlot={mySlot}
+        challenge={challenge}
+      />
+
+      <BattleCalendar
+        players={players}
+        allCheckIns={allCheckIns}
+        allGoals={allGoals}
         challenge={challenge}
       />
 
