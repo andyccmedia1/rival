@@ -74,22 +74,26 @@ export default function Dashboard() {
     return () => supabase.removeChannel(channel)
   }, [id, load])
 
-  const handleCheckIn = async (goalId) => {
+  // toggle a check-in for any date (today or a past day)
+  const toggleCheckInForDate = async (goalId, dateStr) => {
     if (!myPlayer) return
-    const today = format(new Date(), 'yyyy-MM-dd')
-    const already = checkIns.find(ci => ci.goal_id === goalId)
-    if (already) {
-      await supabase.from('check_ins').delete().eq('id', already.id)
+    const existing = allCheckIns.find(ci =>
+      ci.player_id === myPlayer.id && ci.goal_id === goalId && ci.date === dateStr
+    )
+    if (existing) {
+      await supabase.from('check_ins').delete().eq('id', existing.id)
     } else {
       await supabase.from('check_ins').insert({
         player_id: myPlayer.id,
         goal_id: goalId,
-        date: today,
+        date: dateStr,
         completed_at: new Date().toISOString(),
       })
     }
     load()
   }
+
+  const handleCheckIn = (goalId) => toggleCheckInForDate(goalId, format(new Date(), 'yyyy-MM-dd'))
 
   const checkEndCondition = async () => {
     if (!challenge) return
@@ -191,6 +195,8 @@ export default function Dashboard() {
         allCheckIns={allCheckIns}
         allGoals={allGoals}
         challenge={challenge}
+        myPlayerId={myPlayer?.id}
+        onToggle={toggleCheckInForDate}
       />
 
       {notStarted ? (

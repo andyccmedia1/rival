@@ -1,6 +1,6 @@
 import { eachDayOfInterval, parseISO, format } from 'date-fns'
 
-export default function BattleCalendar({ players, allGoals = [], allCheckIns = [], challenge }) {
+export default function BattleCalendar({ players, allGoals = [], allCheckIns = [], challenge, myPlayerId, onToggle }) {
   if (!players || players.length === 0) return null
 
   const player1 = players.find(p => p.slot === 1)
@@ -27,24 +27,37 @@ export default function BattleCalendar({ players, allGoals = [], allCheckIns = [
     const goals = goalsOf(player)
     const doneCount = goals.filter(g => didComplete(player, g.id, dayStr)).length
     const allDone = goals.length > 0 && doneCount === goals.length
+    const editable = player.id === myPlayerId && typeof onToggle === 'function'
     return (
       <div style={{
         flex: 1, minHeight: 34, borderRadius: 8, padding: '5px 6px',
         display: 'flex', flexWrap: 'wrap', gap: 4, alignItems: 'center', justifyContent: 'center',
         background: allDone ? color + '22' : 'rgba(255,255,255,0.06)',
-        border: `1px solid ${allDone ? color : 'var(--glass-border)'}`,
+        border: `1px solid ${allDone ? color : editable ? 'var(--glass-border-strong)' : 'var(--glass-border)'}`,
       }}>
         {goals.map(g => {
           const done = didComplete(player, g.id, dayStr)
+          const chipStyle = {
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            width: 22, height: 22, borderRadius: 6, fontSize: 12,
+            background: done ? color : 'transparent',
+            border: `1px solid ${done ? color : 'var(--glass-border)'}`,
+            opacity: done ? 1 : 0.35,
+            filter: done ? 'none' : 'grayscale(1)',
+            padding: 0,
+          }
+          if (editable) {
+            return (
+              <button
+                key={g.id}
+                onClick={() => onToggle(g.id, dayStr)}
+                title={`${g.label} — tap to ${done ? 'uncheck' : 'check'}`}
+                style={{ ...chipStyle, cursor: 'pointer' }}
+              >{g.emoji}</button>
+            )
+          }
           return (
-            <span key={g.id} title={`${g.label}${done ? ' ✓' : ' (missed)'}`} style={{
-              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-              width: 22, height: 22, borderRadius: 6, fontSize: 12,
-              background: done ? color : 'transparent',
-              border: `1px solid ${done ? color : 'var(--glass-border)'}`,
-              opacity: done ? 1 : 0.35,
-              filter: done ? 'none' : 'grayscale(1)',
-            }}>{g.emoji}</span>
+            <span key={g.id} title={`${g.label}${done ? ' ✓' : ' (missed)'}`} style={chipStyle}>{g.emoji}</span>
           )
         })}
       </div>
@@ -86,7 +99,7 @@ export default function BattleCalendar({ players, allGoals = [], allCheckIns = [
         📅 Daily progress
       </p>
       <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 14 }}>
-        Lit-up icons = completed that day · dim = missed
+        Lit = done · dim = missed. Tap an icon in your row to fix any past day.
       </p>
 
       <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 8 }}>
