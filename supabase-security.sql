@@ -40,9 +40,10 @@ end $$;
 
 -- 4. New policies (all require a logged-in user) ----------------
 
--- CHALLENGES: any authed user can read (needed to look up an invite code)
+-- CHALLENGES: readable by anyone (an invitee previews it before signing in).
+-- Reads are low-sensitivity (no emails here); WRITES are locked down below.
 create policy challenges_select on challenges
-  for select to authenticated using (true);
+  for select using (true);
 -- any authed user can create a challenge
 create policy challenges_insert on challenges
   for insert to authenticated with check (true);
@@ -54,9 +55,9 @@ create policy challenges_delete on challenges
   for delete to authenticated
   using (exists (select 1 from players p where p.challenge_id = challenges.id and p.user_id = auth.uid()));
 
--- PLAYERS: readable by any authed user (see opponent name/avatar/goals)
+-- PLAYERS: readable by anyone (invitee sees who challenged them before signing in)
 create policy players_select on players
-  for select to authenticated using (true);
+  for select using (true);
 -- you may only insert/modify/remove YOUR OWN player row
 create policy players_insert on players
   for insert to authenticated with check (user_id = auth.uid());
@@ -67,7 +68,7 @@ create policy players_delete on players
 
 -- GOALS: readable by any authed user; insert allowed (created at setup time)
 create policy goals_select on goals
-  for select to authenticated using (true);
+  for select using (true);
 create policy goals_insert on goals
   for insert to authenticated with check (true);
 -- deletes happen via challenge cascade; explicit delete restricted to members
@@ -77,7 +78,7 @@ create policy goals_delete on goals
 
 -- CHECK_INS: readable by any authed user; but you can only write YOUR OWN
 create policy checkins_select on check_ins
-  for select to authenticated using (true);
+  for select using (true);
 create policy checkins_insert on check_ins
   for insert to authenticated
   with check (player_id in (select id from players where user_id = auth.uid()));
