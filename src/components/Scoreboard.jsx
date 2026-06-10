@@ -1,16 +1,13 @@
-import { format, eachDayOfInterval, parseISO } from 'date-fns'
+import { computeScore, goalsForPlayer } from '../lib/scoring'
 
 export default function Scoreboard({ players, allCheckIns, allGoals = [], mySlot, challenge }) {
   if (!players || players.length === 0) return null
 
-  const weeksInChallenge = Math.max(1, Math.ceil(challenge.duration_days / 7))
-
   const getScore = (player) => {
-    const ci = allCheckIns.filter(c => c.player_id === player.id)
-    const playerGoals = allGoals.filter(g => (player.goal_ids || []).includes(g.id))
-    const total = playerGoals.reduce((sum, g) => sum + (g.times_per_week || 7) * weeksInChallenge, 0)
-    const pct = total > 0 ? Math.round((ci.length / total) * 100) : 0
-    return { count: ci.length, total, pct }
+    const { earned, total, pct } = computeScore(
+      player, goalsForPlayer(player, allGoals), allCheckIns, challenge
+    )
+    return { count: earned, total, pct }
   }
 
   const player1 = players.find(p => p.slot === 1)

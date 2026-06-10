@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import { computeScore, goalsForPlayer } from '../lib/scoring'
 import Confetti from '../components/Confetti'
 
 export default function Results() {
@@ -20,11 +21,9 @@ export default function Results() {
       const { data: goals } = await supabase.from('goals').select('*').eq('challenge_id', id)
 
       const scores = (ps || []).map(p => {
-        const pGoals = goals?.filter(g => g.player_slot === p.slot) || []
-        const pCI = allCI?.filter(ci => ci.player_id === p.id) || []
-        const totalPossible = pGoals.length * (c?.duration_days || 1)
-        const pct = totalPossible > 0 ? Math.round((pCI.length / totalPossible) * 100) : 0
-        return { ...p, checkIns: pCI.length, totalPossible, pct, goals: pGoals }
+        const pGoals = goalsForPlayer(p, goals || [])
+        const { earned, total, pct } = computeScore(p, pGoals, allCI || [], c)
+        return { ...p, checkIns: earned, totalPossible: total, pct, goals: pGoals }
       })
 
       scores.sort((a, b) => b.pct - a.pct)
