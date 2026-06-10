@@ -5,7 +5,9 @@ import { supabase } from '../lib/supabase'
 export default function Login() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-  const redirect = searchParams.get('redirect') || '/'
+  const rawRedirect = searchParams.get('redirect') || '/'
+  // only allow internal paths (block //evil.com and absolute URLs)
+  const redirect = /^\/(?!\/)/.test(rawRedirect) ? rawRedirect : '/'
   const [mode, setMode] = useState('signin') // 'signin' | 'signup'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')

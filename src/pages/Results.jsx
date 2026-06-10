@@ -15,6 +15,7 @@ export default function Results() {
   useEffect(() => {
     const load = async () => {
       const { data: c } = await supabase.from('challenges').select('*').eq('id', id).single()
+      if (!c) { navigate('/'); return }
       const { data: ps } = await supabase.from('players').select('*').eq('challenge_id', id)
       const { data: allCI } = await supabase.from('check_ins').select('*')
         .in('player_id', (ps || []).map(p => p.id))

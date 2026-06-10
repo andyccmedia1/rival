@@ -43,8 +43,9 @@ export function computeScore(player, goals, checkIns, challenge) {
     const dCount = daysPerWeek[wk]
     for (const g of goals) {
       const n = g.times_per_week || 7
-      // prorate weekly target by days available this week; cap at days (1/day max)
-      const target = Math.min(dCount, Math.round((n * dCount) / 7))
+      // prorate weekly target by days available this week; cap at days (1/day max).
+      // ceil so a goal never silently drops out of a short start/end week.
+      const target = Math.min(dCount, Math.max(1, Math.ceil((n * dCount) / 7)))
       if (target <= 0) continue
       total += target
       const did = counts[wk]?.[g.id] || 0

@@ -101,10 +101,9 @@ export default function Landing() {
                       onClick={async (e) => {
                         e.stopPropagation()
                         if (!confirm('Delete this challenge? This cannot be undone.')) return
-                        await supabase.from('check_ins').delete().in('player_id', [p.id])
-                        await supabase.from('goals').delete().eq('challenge_id', c.id)
-                        await supabase.from('players').delete().eq('challenge_id', c.id)
-                        await supabase.from('challenges').delete().eq('id', c.id)
+                        // FK cascades remove players/goals/check_ins automatically
+                        const { error } = await supabase.from('challenges').delete().eq('id', c.id)
+                        if (error) { alert('Could not delete: ' + error.message); return }
                         setChallenges(prev => prev.filter(x => x.id !== p.id))
                       }}
                       style={{

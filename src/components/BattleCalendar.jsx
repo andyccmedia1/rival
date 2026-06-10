@@ -33,7 +33,7 @@ export default function BattleCalendar({ players, allGoals = [], allCheckIns = [
   const weekGoalStat = (player, goal, weekDays) => {
     const dCount = weekDays.length
     const n = goal.times_per_week || 7
-    const target = Math.min(dCount, Math.round((n * dCount) / 7))
+    const target = Math.min(dCount, Math.max(1, Math.ceil((n * dCount) / 7)))
     const done = weekDays.reduce((sum, d) =>
       sum + (didComplete(player, goal.id, format(d, 'yyyy-MM-dd')) ? 1 : 0), 0)
     return { target, done, met: target > 0 && done >= target }

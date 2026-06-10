@@ -93,11 +93,17 @@ export default function Join() {
         avatar_emoji: avatar,
         slot: 2,
         goal_ids: savedGoals.map(g => g.id),
-        ...(user ? { user_id: user.id } : {}),
+        user_id: user.id,
       })
-      if (pErr) throw pErr
+      // unique(challenge_id, slot) → someone else grabbed slot 2 first
+      if (pErr) {
+        if (pErr.code === '23505') throw new Error('Someone just joined this challenge — it\'s now full!')
+        throw pErr
+      }
 
-      await supabase.from('challenges').update({ status: 'active' }).eq('id', challenge.id)
+      const { error: uErr } = await supabase.from('challenges')
+        .update({ status: 'active' }).eq('id', challenge.id).eq('status', 'pending')
+      if (uErr) throw uErr
 
       localStorage.setItem(`rival_player_${challenge.id}`, JSON.stringify({ slot: 2, name: name.trim(), avatar }))
       navigate(`/challenge/${challenge.id}`)

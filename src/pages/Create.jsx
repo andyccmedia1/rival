@@ -12,7 +12,7 @@ const CUSTOM_EMOJIS = ['⭐', '🎯', '💡', '🔥', '🌟', '💪', '🎨', '�
 
 export default function Create() {
   const navigate = useNavigate()
-  const { user } = useAuth()
+  const { user, loading: authLoading } = useAuth()
   const [step, setStep] = useState(1)
   const [name, setName] = useState('')
   const [avatar, setAvatar] = useState(AVATARS[0])
@@ -72,21 +72,32 @@ export default function Create() {
     setError('')
 
     try {
-      const inviteCode = Math.random().toString(36).slice(2, 8).toUpperCase()
+      // fixed-length 6-char code (no ambiguous 0/O/1/I), retry on rare collision
+      const genCode = () => {
+        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+        let c = ''
+        for (let i = 0; i < 6; i++) c += chars[Math.floor(Math.random() * chars.length)]
+        return c
+      }
 
-      const { data: challenge, error: cErr } = await supabase
-        .from('challenges')
-        .insert({
-          invite_code: inviteCode,
-          duration_days: durationDays,
-          start_date: format(startDate, 'yyyy-MM-dd'),
-          end_date: format(endDate, 'yyyy-MM-dd'),
-          status: 'pending',
-        })
-        .select()
-        .single()
-
-      if (cErr) throw cErr
+      let challenge = null
+      for (let attempt = 0; attempt < 5 && !challenge; attempt++) {
+        const { data, error: cErr } = await supabase
+          .from('challenges')
+          .insert({
+            invite_code: genCode(),
+            duration_days: durationDays,
+            start_date: format(startDate, 'yyyy-MM-dd'),
+            end_date: format(endDate, 'yyyy-MM-dd'),
+            status: 'pending',
+          })
+          .select()
+          .single()
+        if (!cErr) { challenge = data; break }
+        // 23505 = unique_violation (code collision) → retry; else bail
+        if (cErr.code !== '23505') throw cErr
+      }
+      if (!challenge) throw new Error('Could not generate a unique invite code, please try again.')
 
       const goalList = [
         ...goals.map(id => {
@@ -108,7 +119,7 @@ export default function Create() {
         avatar_emoji: avatar,
         slot: 1,
         goal_ids: savedGoals.map(g => g.id),
-        ...(user ? { user_id: user.id } : {}),
+        user_id: user.id,
       })
       if (pErr) throw pErr
 
@@ -120,6 +131,26 @@ export default function Create() {
       setLoading(false)
     }
   }
+
+  if (authLoading) return (
+    <div className="page" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <p style={{ color: 'var(--text-muted)', fontWeight: 700 }}>Loading...</p>
+    </div>
+  )
+
+  if (!user) return (
+    <div className="page" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', paddingTop: 60 }}>
+      <div className="animate-float" style={{ fontSize: 56, marginBottom: 14, filter: 'drop-shadow(0 8px 24px rgba(40,20,80,0.4))' }}>⚔️</div>
+      <h1 style={{ color: 'var(--white)', fontSize: 32, marginBottom: 8 }}>Sign in to create</h1>
+      <p style={{ color: 'var(--text-muted)', fontSize: 14, marginBottom: 32, maxWidth: 300, lineHeight: 1.5 }}>
+        Create an account so your challenge is saved to your profile and you can track it from any device.
+      </p>
+      <button className="btn-primary" style={{ width: '100%', maxWidth: 320 }}
+        onClick={() => navigate('/login?redirect=/create')}>
+        Sign in to continue
+      </button>
+    </div>
+  )
 
   return (
     <div className="page">

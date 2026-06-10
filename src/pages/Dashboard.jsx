@@ -80,15 +80,20 @@ export default function Dashboard() {
     const existing = allCheckIns.find(ci =>
       ci.player_id === myPlayer.id && ci.goal_id === goalId && ci.date === dateStr
     )
-    if (existing) {
-      await supabase.from('check_ins').delete().eq('id', existing.id)
-    } else {
-      await supabase.from('check_ins').insert({
-        player_id: myPlayer.id,
-        goal_id: goalId,
-        date: dateStr,
-        completed_at: new Date().toISOString(),
-      })
+    try {
+      if (existing) {
+        await supabase.from('check_ins').delete()
+          .eq('player_id', myPlayer.id).eq('goal_id', goalId).eq('date', dateStr)
+      } else {
+        // upsert avoids a unique-constraint error if a rapid double-tap races
+        const { error } = await supabase.from('check_ins').upsert(
+          { player_id: myPlayer.id, goal_id: goalId, date: dateStr, completed_at: new Date().toISOString() },
+          { onConflict: 'player_id,goal_id,date', ignoreDuplicates: true }
+        )
+        if (error) throw error
+      }
+    } catch (e) {
+      console.error('[Rival] check-in toggle failed:', e.message)
     }
     load()
   }
@@ -136,7 +141,7 @@ export default function Dashboard() {
   const startD = parseISO(challenge.start_date)
   const endD = parseISO(challenge.end_date)
   const notStarted = today < challenge.start_date
-  const daysTotal = challenge.duration_days
+  const daysTotal = differenceInDays(endD, startD) + 1 // inclusive, matches the calendar
   const daysUntilStart = Math.max(0, differenceInDays(startD, now) + (today < challenge.start_date ? 1 : 0))
   const daysPassed = Math.min(daysTotal, Math.max(0, differenceInDays(now, startD)))
   const daysLeft = Math.max(0, differenceInDays(endD, now) + 1)
