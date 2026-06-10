@@ -5,6 +5,9 @@ import { useAuth } from '../lib/AuthContext'
 import GoalPicker from '../components/GoalPicker'
 import AvatarPicker from '../components/AvatarPicker'
 
+const CUSTOM_COLORS = ['#BA7517', '#D4537E', '#1D9E75', '#534AB7', '#D85A30', '#185FA5']
+const CUSTOM_EMOJIS = ['⭐', '🎯', '💡', '🔥', '🌟', '💪', '🎨', '🧩']
+
 export default function Join() {
   const { inviteCode } = useParams()
   const navigate = useNavigate()
@@ -16,7 +19,8 @@ export default function Join() {
   const [avatar, setAvatar] = useState(AVATARS[3])
   const [goals, setGoals] = useState([])
   const [goalFrequencies, setGoalFrequencies] = useState({})
-  const [customGoal, setCustomGoal] = useState('')
+  const [customGoals, setCustomGoals] = useState([])
+  const [customInput, setCustomInput] = useState('')
   const [customFreq, setCustomFreq] = useState(7)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -68,9 +72,30 @@ export default function Join() {
     setGoalFrequencies(f => ({ ...f, [id]: val }))
   }
 
+  const addCustomGoal = () => {
+    const val = customInput.trim()
+    if (!val) return
+    if (customGoals.length >= 8) { setError('Max 8 custom goals!'); return }
+    const idx = customGoals.length
+    setCustomGoals(prev => [...prev, {
+      id: `custom-${Date.now()}`,
+      label: val,
+      emoji: CUSTOM_EMOJIS[idx % CUSTOM_EMOJIS.length],
+      color: CUSTOM_COLORS[idx % CUSTOM_COLORS.length],
+      timesPerWeek: customFreq,
+    }])
+    setCustomInput('')
+    setCustomFreq(7)
+    setError('')
+  }
+
+  const removeCustomGoal = (cid) => setCustomGoals(prev => prev.filter(g => g.id !== cid))
+  const updateCustomGoalFreq = (cid, freq) =>
+    setCustomGoals(prev => prev.map(g => g.id === cid ? { ...g, timesPerWeek: freq } : g))
+
   const handleJoin = async () => {
     if (!name.trim()) return setError('Enter your name!')
-    if (goals.length === 0) return setError('Pick at least one goal!')
+    if (goals.length + customGoals.length === 0) return setError('Pick at least one goal!')
     setSaving(true)
     setError('')
 
@@ -80,7 +105,9 @@ export default function Join() {
           const g = GOAL_OPTIONS.find(o => o.id === id)
           return { challenge_id: challenge.id, label: g.label, emoji: g.emoji, color: g.color, player_slot: 2, times_per_week: goalFrequencies[id] || 7 }
         }),
-        ...(customGoal.trim() ? [{ challenge_id: challenge.id, label: customGoal.trim(), emoji: '⭐', color: '#BA7517', player_slot: 2, times_per_week: customFreq }] : [])
+        ...customGoals.map(g => ({
+          challenge_id: challenge.id, label: g.label, emoji: g.emoji, color: g.color, player_slot: 2, times_per_week: g.timesPerWeek || 7
+        })),
       ]
 
       const { data: savedGoals, error: gErr } = await supabase
@@ -204,10 +231,60 @@ export default function Join() {
             onFrequencyChange={handleFrequencyChange}
           />
 
-          <div style={{ marginTop: 16 }}>
-            <label style={{ fontWeight: 700, fontSize: 15, display: 'block', marginBottom: 8 }}>Custom goal (optional)</label>
-            <input value={customGoal} onChange={e => setCustomGoal(e.target.value)}
-              placeholder="e.g. No social media" maxLength={30} />
+          <div style={{ marginTop: 20 }}>
+            <label style={{ fontWeight: 700, fontSize: 15, display: 'block', marginBottom: 10 }}>
+              Add custom goals
+              <span style={{ fontWeight: 600, color: 'var(--text-muted)', fontSize: 13, marginLeft: 8 }}>({customGoals.length}/8)</span>
+            </label>
+
+            {customGoals.length > 0 && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 10 }}>
+                {customGoals.map(g => (
+                  <div key={g.id} style={{
+                    background: 'rgba(255,255,255,0.12)', border: '1px solid var(--glass-border-strong)',
+                    backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+                    borderRadius: 'var(--radius-sm)', padding: '10px 12px',
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                      <span style={{ fontSize: 20 }}>{g.emoji}</span>
+                      <span style={{ fontWeight: 600, flex: 1, color: 'var(--white)' }}>{g.label}</span>
+                      <button onClick={() => removeCustomGoal(g.id)} style={{
+                        background: 'none', border: 'none', fontSize: 20,
+                        color: 'var(--text-soft)', padding: '0 4px', lineHeight: 1, cursor: 'pointer',
+                      }}>×</button>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-soft)' }}>days/week:</span>
+                      {[1,2,3,4,5,6,7].map(n => (
+                        <button key={n} onClick={() => updateCustomGoalFreq(g.id, n)} style={{
+                          width: 26, height: 26, borderRadius: '50%',
+                          border: `1px solid ${n === (g.timesPerWeek || 7) ? 'var(--white)' : 'var(--glass-border)'}`,
+                          background: n === (g.timesPerWeek || 7) ? 'var(--white)' : 'rgba(255,255,255,0.08)',
+                          color: n === (g.timesPerWeek || 7) ? '#7B4FB0' : 'var(--white)',
+                          fontWeight: 700, fontSize: 11, cursor: 'pointer',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        }}>{n}</button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div style={{ display: 'flex', gap: 8 }}>
+              <input
+                value={customInput}
+                onChange={e => { setCustomInput(e.target.value); setError('') }}
+                placeholder="e.g. No social media, Walk 10k steps..."
+                maxLength={40}
+                onKeyDown={e => e.key === 'Enter' && addCustomGoal()}
+              />
+              <button onClick={addCustomGoal} style={{
+                background: 'var(--white)', color: '#7B4FB0',
+                borderRadius: 'var(--radius-sm)', padding: '10px 18px',
+                fontWeight: 900, fontSize: 22, flexShrink: 0, lineHeight: 1,
+              }}>+</button>
+            </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
               <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-soft)' }}>days/week:</span>
               {[1,2,3,4,5,6,7].map(n => (
@@ -223,6 +300,9 @@ export default function Join() {
                 </button>
               ))}
             </div>
+            <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 6, fontWeight: 600 }}>
+              Press Enter or + to add each goal
+            </p>
           </div>
 
           {error && <p style={{ color: 'var(--coral)', marginBottom: 12, fontWeight: 700, textAlign: 'center' }}>{error}</p>}
